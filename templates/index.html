@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
+
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
+
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+
+<div class="container">
+
+    <div class="hero-section text-center">
+        <h1>Cine<span>Match</span></h1>
+        <p>Discover movies you'll love.</p>
+    </div>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-7">
+
+            <div class="search-container">
+
+                <form method="POST">
+
+                    <label class="form-label">
+                        Search your favorite movie
+                    </label>
+
+                    <input
+                        type="text"
+                        class="form-control movie-search"
+                        name="selected_movie"
+                        list="movies"
+                        placeholder="🎬 Search movie..."
+                        value="{{ selected_movie if selected_movie else '' }}"
+                        autocomplete="off"
+                        required>
+
+                    <datalist id="movies">
+                        {% for movie in movie_list %}
+                        <option value="{{ movie }}">
+                        {% endfor %}
+                    </datalist>
+
+                    <button
+                        type="submit"
+                        class="btn btn-recommend mt-4 w-100">
+                        🍿 Get Recommendations
+                    </button>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    {% if recommendations %}
+
+    <h4 class="section-title mt-5">
+        Because you liked "{{ selected_movie }}"
+    </h4>
+
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+
+        {% for movie in recommendations %}
+
+        <div class="col">
+
+            <div class="movie-card">
+
+                <div class="img-container">
+                    <img src="{{ movie.poster }}"
+                         alt="{{ movie.title }}">
+                </div>
+
+                <div class="movie-info">
+                    <p class="movie-title">
+                        {{ movie.title }}
+                    </p>
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+    {% endif %}
+
+</div>
+
+<script src="{{ url_for('static', filename='script.js') }}"></script>
+
+</body>
+</html>
