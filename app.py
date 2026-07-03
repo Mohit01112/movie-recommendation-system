@@ -4,24 +4,28 @@ import requests
 
 app = Flask(__name__)
 
-# Load data
+# Load files
 movies = pickle.load(open('movie_list.pkl', 'rb'))
 similarity = pickle.load(open('similarity.pkl', 'rb'))
 
-movie_list = movies['title'].values.tolist()
+# List of all movie titles
+movie_list = movies['title'].tolist()
 
 
 def fetch_poster(movie_id):
-    url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US"
-
+    """
+    Fetch poster from TMDB API
+    """
     try:
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US"
+
         response = requests.get(url, timeout=5)
         data = response.json()
 
         poster_path = data.get("poster_path")
 
         if poster_path:
-            return "https://image.tmdb.org/t/p/w500/" + poster_path
+            return f"https://image.tmdb.org/t/p/w500/{poster_path}"
 
     except Exception as e:
         print("Poster Error:", e)
@@ -31,20 +35,29 @@ def fetch_poster(movie_id):
 
 def recommend(movie):
     try:
+        movie = movie.strip()
+
+        # Check if movie exists
+        if movie not in movie_list:
+            print(f"Movie '{movie}' not found.")
+            return []
+
+        # Get movie index
         index = movies[movies['title'] == movie].index[0]
 
-        # Get precomputed recommendations
+        # Get stored recommendations
         recommendations = similarity[index]
 
         recommended_movies = []
 
         for item in recommendations:
 
-            # If stored as (movie_index, score)
+            # If similarity.pkl stores tuples
             if isinstance(item, tuple):
                 movie_index = item[0]
+
+            # If similarity.pkl stores only indices
             else:
-                # If stored as only movie indices
                 movie_index = item
 
             movie_id = movies.iloc[movie_index].movie_id
@@ -67,7 +80,7 @@ def home():
     selected_movie = ""
 
     if request.method == "POST":
-        selected_movie = request.form.get("selected_movie")
+        selected_movie = request.form.get("selected_movie", "").strip()
 
         if selected_movie:
             recommendations = recommend(selected_movie)
