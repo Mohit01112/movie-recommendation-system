@@ -417,7 +417,7 @@ Through this project, hands-on experience was gained in:
 
 ## 👨‍💻 Author
 
-**Mohit **
+**Mohit**
 
 <div align="center">
 
