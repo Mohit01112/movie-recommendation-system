@@ -1,16 +1,22 @@
-## this is the project for the movie reccomaendation
 from flask import Flask, render_template, request
 import pickle
 import requests
+import os
 
 app = Flask(__name__)
 
+# Get the directory where app.py is located
+BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+
 # Load files
-movies = pickle.load(open('movie_list.pkl', 'rb'))
-similarity = pickle.load(open('similarity.pkl', 'rb'))
+with open(os.path.join(BASE_DIR, "movie_list.pkl"), "rb") as f:
+    movies = pickle.load(f)
+
+with open(os.path.join(BASE_DIR, "similarity.pkl"), "rb") as f:
+    similarity = pickle.load(f)
 
 # List of all movie titles
-movie_list = movies['title'].tolist()
+movie_list = movies["title"].tolist()
 
 
 def fetch_poster(movie_id):
@@ -18,9 +24,16 @@ def fetch_poster(movie_id):
     Fetch poster from TMDB API
     """
     try:
-        url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key=8265bd1679663a7ea12ac168da84d2e8&language=en-US"
+        url = f"https://api.themoviedb.org/3/movie/{movie_id}"
 
-        response = requests.get(url, timeout=5)
+        params = {
+            "api_key": os.getenv("TMDB_API_KEY"),
+            "language": "en-US"
+        }
+
+        response = requests.get(url, params=params, timeout=5)
+        response.raise_for_status()
+
         data = response.json()
 
         poster_path = data.get("poster_path")
@@ -38,26 +51,20 @@ def recommend(movie):
     try:
         movie = movie.strip()
 
-        # Check if movie exists
         if movie not in movie_list:
             print(f"Movie '{movie}' not found.")
             return []
 
-        # Get movie index
-        index = movies[movies['title'] == movie].index[0]
+        index = movies[movies["title"] == movie].index[0]
 
-        # Get stored recommendations
         recommendations = similarity[index]
 
         recommended_movies = []
 
         for item in recommendations:
 
-            # If similarity.pkl stores tuples
             if isinstance(item, tuple):
                 movie_index = item[0]
-
-            # If similarity.pkl stores only indices
             else:
                 movie_index = item
 
@@ -77,11 +84,16 @@ def recommend(movie):
 
 @app.route("/", methods=["GET", "POST"])
 def home():
+
     recommendations = None
     selected_movie = ""
 
     if request.method == "POST":
-        selected_movie = request.form.get("selected_movie", "").strip()
+
+        selected_movie = request.form.get(
+            "selected_movie",
+            ""
+        ).strip()
 
         if selected_movie:
             recommendations = recommend(selected_movie)
@@ -95,4 +107,4 @@ def home():
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run()
