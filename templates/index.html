@@ -3,397 +3,107 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CineMatch</title>
 
-    <title>CineMatch | Movie Recommendations</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
+          rel="stylesheet">
 
-    <!-- Bootstrap -->
-    <link
-        href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css"
-        rel="stylesheet"
-    >
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap"
+          rel="stylesheet">
 
-    <!-- Google Font -->
-    <link
-        href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Poppins:wght@400;500;600;700;800&display=swap"
-        rel="stylesheet"
-    >
-
-    <!-- Icons -->
-    <link
-        rel="stylesheet"
-        href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css"
-    >
-
-    <!-- Custom CSS -->
-    <link
-        rel="stylesheet"
-        href="{{ url_for('static', filename='style.css') }}"
-    >
+    <link rel="stylesheet"
+          href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
 
-    <!-- Background Effects -->
-    <div class="background-effects">
-        <div class="glow glow-one"></div>
-        <div class="glow glow-two"></div>
-        <div class="glow glow-three"></div>
+<div class="container">
+
+    <div class="hero-section text-center">
+        <h1>Cine<span>Match</span></h1>
+        <p>Discover movies you'll love.</p>
     </div>
 
+    <div class="row justify-content-center">
 
-    <!-- Navigation -->
-    <nav class="navbar navbar-expand-lg cine-navbar">
-
-        <div class="container">
-
-            <a class="navbar-brand cine-logo" href="/">
-                <span class="logo-icon">🎬</span>
-                Cine<span>Match</span>
-            </a>
-
-            <div class="nav-status">
-                <span class="status-dot"></span>
-                AI Recommendation Engine
-            </div>
-
-        </div>
-
-    </nav>
-
-
-    <!-- Main Content -->
-    <main class="container main-container">
-
-
-        <!-- Hero -->
-        <section class="hero-section text-center">
-
-            <div class="hero-badge">
-                <i class="bi bi-stars"></i>
-                Personalized Movie Discovery
-            </div>
-
-            <h1>
-                Find your next
-                <span class="gradient-text">favorite movie.</span>
-            </h1>
-
-            <p class="hero-description">
-                Choose a movie you love and let CineMatch discover
-                movies with a similar cinematic experience.
-            </p>
-
-        </section>
-
-
-        <!-- Search Card -->
-        <section class="search-wrapper">
+        <div class="col-lg-7">
 
             <div class="search-container">
 
-                <div class="search-header">
-
-                    <div class="search-icon">
-                        <i class="bi bi-search"></i>
-                    </div>
-
-                    <div>
-                        <h5>What are you watching?</h5>
-                        <p>Search for a movie to get personalized recommendations.</p>
-                    </div>
-
-                </div>
-
-
                 <form method="POST">
 
-                    <div class="search-input-wrapper">
+                    <label class="form-label">
+                        Search your favorite movie
+                    </label>
 
-                        <i class="bi bi-film input-icon"></i>
+                    <input
+                        type="text"
+                        class="form-control movie-search"
+                        name="selected_movie"
+                        list="movies"
+                        placeholder="🎬 Search movie..."
+                        value="{{ selected_movie if selected_movie else '' }}"
+                        autocomplete="off"
+                        required>
 
-                        <input
-                            type="text"
-                            class="form-control movie-search"
-                            name="selected_movie"
-                            list="movies"
-                            placeholder="Search a movie..."
-                            value="{{ selected_movie if selected_movie else '' }}"
-                            autocomplete="off"
-                            required
-                        >
-
-                        <datalist id="movies">
-
-                            {% for movie in movie_list %}
-
-                            <option value="{{ movie }}"></option>
-
-                            {% endfor %}
-
-                        </datalist>
-
-                    </div>
-
+                    <datalist id="movies">
+                        {% for movie in movie_list %}
+                        <option value="{{ movie }}">
+                        {% endfor %}
+                    </datalist>
 
                     <button
                         type="submit"
-                        class="btn btn-recommend"
-                    >
-
-                        <span>
-                            <i class="bi bi-magic"></i>
-                            Discover Movies
-                        </span>
-
-                        <i class="bi bi-arrow-right"></i>
-
+                        class="btn btn-recommend mt-4 w-100">
+                        🍿 Get Recommendations
                     </button>
 
                 </form>
 
             </div>
 
-        </section>
+        </div>
 
+    </div>
 
-        <!-- Recommendations -->
-        {% if recommendations %}
+    {% if recommendations %}
 
-        <section class="recommendations-section">
+    <h4 class="section-title mt-5">
+        Because you liked "{{ selected_movie }}"
+    </h4>
 
-            <div class="recommendation-heading">
+    <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
 
-                <div>
+        {% for movie in recommendations %}
 
-                    <span class="section-label">
-                        <i class="bi bi-stars"></i>
-                        YOUR RECOMMENDATIONS
-                    </span>
+        <div class="col">
 
-                    <h2>
-                        Because you liked
-                        <span>"{{ selected_movie }}"</span>
-                    </h2>
+            <div class="movie-card">
 
-                    <p>
-                        Here are movies our recommendation engine
-                        thinks you might enjoy.
+                <div class="img-container">
+                    <img src="{{ movie.poster }}"
+                         alt="{{ movie.title }}">
+                </div>
+
+                <div class="movie-info">
+                    <p class="movie-title">
+                        {{ movie.title }}
                     </p>
-
-                </div>
-
-                <div class="recommendation-count">
-                    <strong>{{ recommendations|length }}</strong>
-                    <span>Movies</span>
                 </div>
 
             </div>
 
+        </div>
 
-            <div class="row row-cols-2 row-cols-md-3 row-cols-lg-5 g-4">
+        {% endfor %}
 
-                {% for movie in recommendations %}
+    </div>
 
-                <div class="col">
+    {% endif %}
 
-                    <article class="movie-card">
+</div>
 
-                        <div class="poster-wrapper">
-
-                            <img
-                                src="{{ movie.poster }}"
-                                alt="{{ movie.title }}"
-                                class="movie-poster"
-                                loading="lazy"
-                            >
-
-                            <div class="poster-overlay">
-
-                                <div class="play-button">
-                                    <i class="bi bi-play-fill"></i>
-                                </div>
-
-                            </div>
-
-                            <div class="movie-number">
-                                #{{ loop.index }}
-                            </div>
-
-                        </div>
-
-
-                        <div class="movie-info">
-
-                            <h3 class="movie-title">
-                                {{ movie.title }}
-                            </h3>
-
-                            <div class="movie-meta">
-
-                                <span>
-                                    <i class="bi bi-stars"></i>
-                                    Recommended
-                                </span>
-
-                            </div>
-
-                        </div>
-
-                    </article>
-
-                </div>
-
-                {% endfor %}
-
-            </div>
-
-        </section>
-
-        {% else %}
-
-        <!-- Empty State -->
-        <section class="empty-state">
-
-            <div class="empty-icon">
-                🎞️
-            </div>
-
-            <h3>Your movie journey starts here</h3>
-
-            <p>
-                Search for a movie above and discover
-                something new to watch.
-            </p>
-
-        </section>
-
-        {% endif %}
-
-
-        <!-- How It Works -->
-        <section class="how-section">
-
-            <div class="text-center section-intro">
-
-                <span class="section-label">
-                    HOW IT WORKS
-                </span>
-
-                <h2>
-                    Discover movies in
-                    <span class="gradient-text">three steps.</span>
-                </h2>
-
-            </div>
-
-
-            <div class="row g-4">
-
-                <div class="col-md-4">
-
-                    <div class="feature-card">
-
-                        <div class="feature-number">
-                            01
-                        </div>
-
-                        <div class="feature-icon">
-                            <i class="bi bi-search"></i>
-                        </div>
-
-                        <h4>Choose a Movie</h4>
-
-                        <p>
-                            Select a movie you already love
-                            from our collection.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <div class="feature-card">
-
-                        <div class="feature-number">
-                            02
-                        </div>
-
-                        <div class="feature-icon">
-                            <i class="bi bi-cpu"></i>
-                        </div>
-
-                        <h4>AI Finds Similarities</h4>
-
-                        <p>
-                            Our content-based recommendation
-                            engine analyzes movie similarity.
-                        </p>
-
-                    </div>
-
-                </div>
-
-
-                <div class="col-md-4">
-
-                    <div class="feature-card">
-
-                        <div class="feature-number">
-                            03
-                        </div>
-
-                        <div class="feature-icon">
-                            <i class="bi bi-film"></i>
-                        </div>
-
-                        <h4>Discover Something New</h4>
-
-                        <p>
-                            Explore a curated list of movies
-                            similar to your selection.
-                        </p>
-
-                    </div>
-
-                </div>
-
-            </div>
-
-        </section>
-
-
-        <!-- Footer -->
-        <footer class="cine-footer">
-
-            <div class="footer-logo">
-                🎬 Cine<span>Match</span>
-            </div>
-
-            <p>
-                Discover movies you'll love.
-            </p>
-
-            <div class="footer-line"></div>
-
-            <small>
-                Built with Python · Flask · Scikit-learn · TMDB API
-            </small>
-
-        </footer>
-
-    </main>
-
-
-    <!-- Bootstrap JS -->
-    <script
-        src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js">
-    </script>
-
-    <!-- Custom JS -->
-    <script src="{{ url_for('static', filename='script.js') }}"></script>
+<script src="{{ url_for('static', filename='script.js') }}"></script>
 
 </body>
 </html>
+
